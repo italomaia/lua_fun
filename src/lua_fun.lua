@@ -1,17 +1,56 @@
---- evaluates a single value generator into an array
+--- evaluates a one or two values generator into a table
+-- creates an array for a single value generator
 --
 -- @tparam function gen
 -- @raise if `gen` is not a function
--- @return table tmp
-local function toarray (gen)
+-- @return table
+local function totable (gen)
   if type(gen) == 'function' then
     local tmp = {}
 
-    for value in gen do
-      table.insert(tmp, value)
+    for k, v in gen do
+      if v == nil then
+        table.insert(tmp, k)
+      else
+        tmp[k] = v
+      end
     end
 
     return tmp
+  else error('unsupported param type') end
+end
+
+--- creates a generator function for the items of `t`
+--
+-- @tparam table t
+-- @raise if `t` is not table
+-- @return function () callable that returns each value in `t` once
+-- @usage gen = generator({2, 3, 4}); assert(gen() == 2); assert(gen() == 3); assert(gen() == 4);
+local function generator (t)
+  if type(t) == 'table' then
+    local index, value
+
+    return function ()
+      index, value = next(t, index)
+      return index, value
+    end
+  else error('unsupported param type') end
+end
+
+--- creates a generator function for the keys of `t`
+--
+-- @tparam table t
+-- @raise if `t` is not table
+-- @return function () callable that returns each value in `t` once
+-- @usage gen = generator({2, 3, 4}); assert(gen() == 2); assert(gen() == 3); assert(gen() == 4);
+local function keys (t)
+  if type(t) == 'table' then
+    local index, value
+
+    return function ()
+      index, value = next(t, index)
+      return index
+    end
   else error('unsupported param type') end
 end
 
@@ -21,7 +60,7 @@ end
 -- @raise if `t` is not table
 -- @return function () callable that returns each value in `t` once
 -- @usage gen = generator({2, 3, 4}); assert(gen() == 2); assert(gen() == 3); assert(gen() == 4);
-local function generator (t)
+local function values (t)
   if type(t) == 'table' then
     local index, value
 
@@ -70,7 +109,7 @@ end
 -- @return new array with the new values
 -- @usage map({1, 2, 3}, tostring)  -- {'1', '2', '3'}
 local function map (fn, t)
-  local gen = type(t) == 'table' and generator(t) or t
+  local gen = type(t) == 'table' and values(t) or t
   return function ()
     local v = gen()
     return v and fn(v) or nil
@@ -86,7 +125,7 @@ end
 -- @return new array with values for cases where `fn(value)` was not falsy
 -- @usage filter({1, 2, 3}, function (v) return v < 3 end)  -- {1, 2}
 local function filter (fn, t)
-  local gen = type(t) == 'table' and generator(t) or t
+  local gen = type(t) == 'table' and values(t) or t
   return function ()
     for v in gen do
       if fn(v) then return v end
@@ -105,7 +144,7 @@ end
 -- @tparam[opt] number init
 -- @usage reduce({1, 2, 3}, function (a, b, 0) return a + b end)  -- 6
 local function reduce (fn, t, init)
-  local gen = type(t) == 'table' and generator(t) or t
+  local gen = type(t) == 'table' and values(t) or t
   init = init or gen()
   
   for v in gen do
@@ -128,10 +167,10 @@ end
 --         and the others are values of elements of {...} for each
 --         key of `t`.
 local function zip (...)
-  local tmp = toarray(map(generator, {...}))
+  local tmp = totable(map(values, {...}))
   
   return function ()
-    return table.unpack(toarray(map(call, tmp)))
+    return table.unpack(totable(map(call, tmp)))
   end
 end
 
@@ -148,8 +187,12 @@ local function partial (fn, ...)
   local pargs = {...}
 
   return function (...)
-    local args = {}
+    local args = { }
     
+    for _, v in pairs(pargs) do
+      table.insert(args, v)
+    end
+
     for _, v in pairs({...}) do
       table.insert(args, v)
     end
@@ -170,6 +213,7 @@ local function pick (index, ...)
 end
 
 --- creates a function that returns the same value given the same input
+-- cache doesn't work if return value is nil
 --
 -- @tparam function fn
 -- @tparam table cache provide your own instance for custom cache behavior
@@ -192,13 +236,15 @@ return {
   ["call"]=call,
   ["compose"]=compose,
   ["filter"]=filter,
-  ["get"]=get,
   ["generator"]=generator,
+  ["get"]=get,
+  ["keys"]=keys,
   ["map"]=map,
   ["memoize"]=memoize,
   ["partial"]=partial,
   ["pick"]=pick,
   ["reduce"]=reduce,
-  ["toarray"]=toarray,
+  ["totable"]=totable,
+  ["values"]=values,
   ["zip"]=zip,
 }
