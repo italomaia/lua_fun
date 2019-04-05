@@ -92,6 +92,22 @@ local function compose (fn_a, fn_b)
   end
 end
 
+--- creates a new function that inverts the argument order
+-- very useful to work around api incompatibilities
+--
+-- @tparam function fn
+-- @return new function with parameters order inverted
+-- @usage pow2 = partial(flip(math.pow), 2)
+local function flip (fn)
+  return function (...)
+    local args = {...}
+  
+    -- invert it
+    table.sort(args, function (a, b) return b < a end)
+    return fn(table.unpack(args))
+  end
+end
+
 --- gets the value of `t` in the `index` position 
 --
 -- @tparam table t
@@ -236,6 +252,7 @@ return {
   ["call"]=call,
   ["compose"]=compose,
   ["filter"]=filter,
+  ["flip"]=flip,
   ["generator"]=generator,
   ["get"]=get,
   ["keys"]=keys,

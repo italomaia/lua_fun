@@ -335,3 +335,28 @@ describe('partial output is as expected', function ()
     assert.is_equal(second(fn()), 4)
   end)
 end)
+
+describe('flip output is as expected', function ()
+  local flip = require('lua_fun').flip
+
+  it('returns a new function', function ()
+    local hello = function () return "hi" end
+    
+    assert.are.equal(type(flip(hello)), 'function')
+    assert.are_not.equal(flip(hello), hello)
+  end)
+
+  it('works with functions without arguments', function ()
+    local hello = function () return "Hello!" end
+    
+    assert.are.equal(hello(), flip(hello)())
+  end)
+
+  it('inverts argument order', function ()
+    local hello = function (name, greeting)
+      return greeting .. ' ' .. name
+    end
+
+    assert.are.equal(hello("italo", "hi"), flip(hello)("hi", "italo"))
+  end)
+end)
