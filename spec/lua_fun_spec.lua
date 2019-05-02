@@ -360,3 +360,77 @@ describe('flip output is as expected', function ()
     assert.are.equal(hello("italo", "hi"), flip(hello)("hi", "italo"))
   end)
 end)
+
+
+describe('factory output is as expected', function ()
+  local factory = require('lua_fun').factory
+  local totable = require('lua_fun').totable
+  local pick = require('lua_fun').pick
+
+  it('creates a new function', function ()
+    assert.are.equal(type(factory(function() end)), 'function')
+  end)
+
+  it('condition is optional', function ()
+    local fn = factory(function() end)
+
+    assert.is_nil(pick(2, fn()))
+    assert.is_nil(pick(2, fn()))
+    assert.is_nil(pick(2, fn()))
+  end)
+
+  it('each call receives the last value of the call', function ()
+    local fn = factory(function(i, v) 
+      if v == nil then return 1 end
+      return v + 2
+    end)
+
+    assert.are.same({1, 1}, {fn()})
+    assert.are.same({2, 3}, {fn()})
+    assert.are.same({3, 5}, {fn()})
+  end)
+
+  it('stop condition is inclusive', function ()
+    local fn = factory(
+      function (i, v) return i end,
+      function (i, v) return i == 5 end
+    )
+    
+    assert.are.same({1,2,3,4}, totable(fn))
+  end)
+
+  it('initial value sets first iteration value', function ()
+    local fn = factory(
+      function (i, v) return v + 1 end,
+      function (i, v) return v == 5 end,
+      2
+    )
+    
+    assert.are.same({3,4,5}, totable(fn))
+  end)
+end)
+
+describe('lambda output is as expected', function ()
+  local lambda = require('lua_fun').lambda
+
+  it('creates a new function', function()
+    assert.are.equal(type(lambda('|| 5')), 'function')
+  end)
+
+  it("doesn't need arguments", function()
+    assert.are.equal(lambda('|| 5')(), 5)
+  end)
+
+  it("doesn't have access to outer scope", function()
+    local outer = 10
+    assert.are.equal(lambda('|| outer')(), nil)
+  end)
+
+  it("accepts one parameter", function()
+    assert.are.equal(lambda('|x| x')(4), 4)
+  end)
+
+  it("accepts multiple parameters", function()
+    assert.are.equal(lambda('|x, y| x + y')(3, 4), 7)
+  end)
+end)

@@ -117,6 +117,25 @@ local function get (index, t)
   return t[index]
 end
 
+--- generates values until condition is met
+--
+-- @tparam function fn(i, v) generates value series; receives init or last call output as input
+-- @tparam[opt=function] function fnc(i, v) exclusive condition of stop; if omitted, factory never stops
+-- @tparam[opt] any init
+-- @usage factory(L'|i,v| v + 1', L'|i,v| v == 10')
+local function factory (fn, fnc, init)
+  local value, index = init, 0
+  fnc = fnc or function () return false end
+
+  return function ()
+    index = index + 1
+    if not fnc(index, value) then
+      value = fn(index, value)
+      return index, value
+    end
+  end
+end
+
 --- map function
 -- applies `fn` once to each value of `t`; return value is a generator.
 --
@@ -147,6 +166,19 @@ local function filter (fn, t)
       if fn(v) then return v end
     end
   end
+end
+
+--- shortcut for creating an inline function with implicit return
+-- syntax: |<params?>| <return values>
+--
+-- @tparam string desc function description
+-- @return function new function
+-- @usage lambda('|p1,p2| p1+p2')  -- function(p1, p2) return p1 + p2 end
+local function lambda (desc)
+  local params, rt = string.match(desc, "|(.-)|%s*(.+)")
+  
+  if rt == '' then error('please, provide return expression') end
+  return load(string.format("return function (%s) return %s end", params, rt))()
 end
 
 --- fp reduce function
@@ -251,11 +283,13 @@ end
 return {
   ["call"]=call,
   ["compose"]=compose,
+  ["factory"]=factory,
   ["filter"]=filter,
   ["flip"]=flip,
   ["generator"]=generator,
   ["get"]=get,
   ["keys"]=keys,
+  ["lambda"]=lambda,
   ["map"]=map,
   ["memoize"]=memoize,
   ["partial"]=partial,
