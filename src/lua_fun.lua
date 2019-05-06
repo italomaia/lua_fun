@@ -1,5 +1,5 @@
 --- evaluates a one or two values generator into a table
--- creates an array for a single value generator
+-- creates an array for a single value generator and a regular table otherwise
 --
 -- @tparam function gen
 -- @raise if `gen` is not a function
@@ -25,7 +25,7 @@ end
 -- @tparam table t
 -- @raise if `t` is not table
 -- @return function () callable that returns each value in `t` once
--- @usage gen = generator({2, 3, 4}); assert(gen() == 2); assert(gen() == 3); assert(gen() == 4);
+-- @usage gen = generator({2, 3, 4}); assert(({gen()})[2] == 2); assert(({gen()})[2] == 3); assert(({gen()})[2] == 4);
 local function generator (t)
   if type(t) == 'table' then
     local index, value
@@ -264,7 +264,7 @@ end
 -- cache doesn't work if return value is nil
 --
 -- @tparam function fn
--- @tparam table cache provide your own instance for custom cache behavior
+-- @tparam[opt] table cache provide your own instance for custom cache behavior
 -- @return ...
 local function memoize (fn, cache)
   cache = cache or {}
