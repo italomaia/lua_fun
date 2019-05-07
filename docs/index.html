@@ -1,0 +1,681 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>lua_fun documentation</title>
+    <link rel="stylesheet" href="ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>lua_fun</h1>
+
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Local_Functions">Local Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>lua_fun</strong></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>lua_fun</code></h1>
+<p>evaluates a one or two values generator into a table
+ creates an array for a single value generator and a regular table otherwise</p>
+<p></p>
+
+
+<h2><a href="#Local_Functions">Local Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#generator">generator (t)</a></td>
+	<td class="summary">creates a generator function for the items of `t`</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#keys">keys (t)</a></td>
+	<td class="summary">creates a generator function for the keys of `t`</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#values">values (t)</a></td>
+	<td class="summary">creates a generator function for the values of `t`</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#call">call (fn, ...)</a></td>
+	<td class="summary">calls a function with the provided argument
+ also useful to force call a function reference</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#compose">compose (fn_a, fn_b)</a></td>
+	<td class="summary">creates a new function that calls `fn_a` with the output of `fn_b`</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#flip">flip (fn)</a></td>
+	<td class="summary">creates a new function that inverts the argument order
+ very useful to work around api incompatibilities</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get">get (index, t)</a></td>
+	<td class="summary">gets the value of `t` in the `index` position</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#factory">factory (fn[, fnc=function[, init]])</a></td>
+	<td class="summary">generates values until condition is met</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#map">map (fn, t)</a></td>
+	<td class="summary">map function
+ applies `fn` once to each value of `t`; return value is a generator.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#filter">filter (fn, t)</a></td>
+	<td class="summary">fp filter function
+ creates a new array where each value is the result
+ of calling `fn` against a value of `t` if it is not falsy.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#lambda">lambda (desc)</a></td>
+	<td class="summary">shortcut for creating an inline function with implicit return
+ syntax: |<params?>| <return values></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#reduce">reduce (fn, t[, init])</a></td>
+	<td class="summary">fp reduce function
+ reduces `t` to a single element by applying `fn` against
+ each value of `t` in pairs.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#zip">zip (table, ...)</a></td>
+	<td class="summary">puts together each element of `t1` with a corresponding element of each table in `...`
+ for each key of `t1`, puts the value of `t1[key]` and `tx[key]`, where
+ tx is a table from `...`  together in an array.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#partial">partial (fn, ...)</a></td>
+	<td class="summary">creates a new function with new defaults</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#pick">pick (index, ...)</a></td>
+	<td class="summary">picks the nth item from a multi value input</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#memoize">memoize (fn[, cache])</a></td>
+	<td class="summary">creates a function that returns the same value given the same input
+ cache doesn't work if return value is nil</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Local_Functions"></a>Local Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "generator"></a>
+    <strong>generator (t)</strong>
+    </dt>
+    <dd>
+    creates a generator function for the items of `t`
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        function () callable that returns each value in `t` once
+    </ol>
+
+    <h3>Raises:</h3>
+    if `t` is not table
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">gen = generator({<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>}); <span class="global">assert</span>(({gen()})[<span class="number">2</span>] == <span class="number">2</span>); <span class="global">assert</span>(({gen()})[<span class="number">2</span>] == <span class="number">3</span>); <span class="global">assert</span>(({gen()})[<span class="number">2</span>] == <span class="number">4</span>);</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "keys"></a>
+    <strong>keys (t)</strong>
+    </dt>
+    <dd>
+    creates a generator function for the keys of `t`
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        function () callable that returns each value in `t` once
+    </ol>
+
+    <h3>Raises:</h3>
+    if `t` is not table
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">gen = generator({<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>}); <span class="global">assert</span>(gen() == <span class="number">2</span>); <span class="global">assert</span>(gen() == <span class="number">3</span>); <span class="global">assert</span>(gen() == <span class="number">4</span>);</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "values"></a>
+    <strong>values (t)</strong>
+    </dt>
+    <dd>
+    creates a generator function for the values of `t`
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        function () callable that returns each value in `t` once
+    </ol>
+
+    <h3>Raises:</h3>
+    if `t` is not table
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">gen = generator({<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>}); <span class="global">assert</span>(gen() == <span class="number">2</span>); <span class="global">assert</span>(gen() == <span class="number">3</span>); <span class="global">assert</span>(gen() == <span class="number">4</span>);</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "call"></a>
+    <strong>call (fn, ...)</strong>
+    </dt>
+    <dd>
+    calls a function with the provided argument
+ also useful to force call a function reference
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+         arguments passed to `fn`
+        </li>
+        <li><span class="parameter">...</span>
+         arguments passed to `fn`
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        any
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "compose"></a>
+    <strong>compose (fn_a, fn_b)</strong>
+    </dt>
+    <dd>
+    creates a new function that calls `fn_a` with the output of `fn_b`
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn_a</span>
+            <span class="types"><span class="type">function</span></span>
+
+        </li>
+        <li><span class="parameter">fn_b</span>
+            <span class="types"><span class="type">function</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new composed function
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "flip"></a>
+    <strong>flip (fn)</strong>
+    </dt>
+    <dd>
+    creates a new function that inverts the argument order
+ very useful to work around api incompatibilities
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new function with parameters order inverted
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">pow2 = partial(flip(<span class="global">math</span>.pow), <span class="number">2</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "get"></a>
+    <strong>get (index, t)</strong>
+    </dt>
+    <dd>
+    gets the value of `t` in the `index` position
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+
+        </li>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        any
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="global">assert</span>(get(<span class="number">2</span>, {<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>}) == <span class="number">6</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "factory"></a>
+    <strong>factory (fn[, fnc=function[, init]])</strong>
+    </dt>
+    <dd>
+    generates values until condition is met
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+        (i, v) generates value series; receives init or last call output as input
+        </li>
+        <li><span class="parameter">fnc</span>
+            <span class="types"><span class="type">function</span></span>
+        (i, v) exclusive condition of stop; if omitted, factory never stops
+         (<em>default</em> function)
+        </li>
+        <li><span class="parameter">init</span>
+            <span class="types"><span class="type">any</span></span>
+
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">factory(L<span class="string">'|i,v| v + 1'</span>, L<span class="string">'|i,v| v == 10'</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "map"></a>
+    <strong>map (fn, t)</strong>
+    </dt>
+    <dd>
+    map function
+ applies `fn` once to each value of `t`; return value is a generator.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+        (v) called once for each value of `t`
+        </li>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">array</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new array with the new values
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">map({<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>}, <span class="global">tostring</span>)  <span class="comment">-- {'1', '2', '3'}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "filter"></a>
+    <strong>filter (fn, t)</strong>
+    </dt>
+    <dd>
+    fp filter function
+ creates a new array where each value is the result
+ of calling `fn` against a value of `t` if it is not falsy.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+        (v) called once for each value of `t`
+        </li>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">array</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new array with values for cases where `fn(value)` was not falsy
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">filter({<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>}, <span class="keyword">function</span> (v) <span class="keyword">return</span> v &lt; <span class="number">3</span> <span class="keyword">end</span>)  <span class="comment">-- {1, 2}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "lambda"></a>
+    <strong>lambda (desc)</strong>
+    </dt>
+    <dd>
+    shortcut for creating an inline function with implicit return
+ syntax: |<params?>| <return values>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">desc</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         function description
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        function new function
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">lambda(<span class="string">'|p1,p2| p1+p2'</span>)  <span class="comment">-- function(p1, p2) return p1 + p2 end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "reduce"></a>
+    <strong>reduce (fn, t[, init])</strong>
+    </dt>
+    <dd>
+    fp reduce function
+ reduces `t` to a single element by applying `fn` against
+ each value of `t` in pairs.  The first pair is always
+ the value of `init` against the first item of `t`. Keep
+ in mind that if not provided `init` is nil.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+         (v1, v2)
+        </li>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">array</span></span>
+
+        </li>
+        <li><span class="parameter">init</span>
+            <span class="types"><span class="type">number</span></span>
+
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">reduce({<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>}, <span class="keyword">function</span> (a, b, <span class="number">0</span>) <span class="keyword">return</span> a + b <span class="keyword">end</span>)  <span class="comment">-- 6</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "zip"></a>
+    <strong>zip (table, ...)</strong>
+    </dt>
+    <dd>
+    puts together each element of `t1` with a corresponding element of each table in `...`
+ for each key of `t1`, puts the value of `t1[key]` and `tx[key]`, where
+ tx is a table from `...`  together in an array.  If `t1` and `tx` are uneven
+ or keys in `t1` are not found in `tx`, the value of `t1` for such cases will be
+ an array with less than `#{...} + 1` elements.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">table</span>
+
+        </li>
+        <li><span class="parameter">...</span>
+         variable number of tables
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+         table where each key is a key of `t` and each value is
+         a array where the first element is a value of `t` and
+         and the others are values of elements of {...} for each
+         key of `t`.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "partial"></a>
+    <strong>partial (fn, ...)</strong>
+    </dt>
+    <dd>
+    creates a new function with new defaults
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+
+        </li>
+        <li><span class="parameter">...</span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> fn = partial(<span class="keyword">function</span> (a, b) <span class="keyword">return</span> a*b <span class="keyword">end</span>, <span class="number">2</span>)
+<span class="global">assert</span>(fn(<span class="number">2</span>) == <span class="number">4</span>)
+<span class="global">assert</span>(fn(<span class="number">3</span>) == <span class="number">6</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "pick"></a>
+    <strong>pick (index, ...)</strong>
+    </dt>
+    <dd>
+    picks the nth item from a multi value input
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+
+        </li>
+        <li><span class="parameter">...</span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="global">assert</span>(pick(<span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>) == <span class="number">6</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "memoize"></a>
+    <strong>memoize (fn[, cache])</strong>
+    </dt>
+    <dd>
+    creates a function that returns the same value given the same input
+ cache doesn't work if return value is nil
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+
+        </li>
+        <li><span class="parameter">cache</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         provide your own instance for custom cache behavior
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        ...
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-05-07 21:06:57 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

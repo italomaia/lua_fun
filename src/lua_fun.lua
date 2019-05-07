@@ -101,15 +101,16 @@ end
 local function flip (fn)
   return function (...)
     local args = {...}
-  
+
     -- invert it
     table.sort(args, function (a, b) return b < a end)
     return fn(table.unpack(args))
   end
 end
 
---- gets the value of `t` in the `index` position 
+--- gets the value of `t` in the `index` position
 --
+-- @tparam int index
 -- @tparam table t
 -- @return any
 -- @usage assert(get(2, {5, 6, 7}) == 6)
@@ -176,7 +177,7 @@ end
 -- @usage lambda('|p1,p2| p1+p2')  -- function(p1, p2) return p1 + p2 end
 local function lambda (desc)
   local params, rt = string.match(desc, "|(.-)|%s*(.+)")
-  
+
   if rt == '' then error('please, provide return expression') end
   return load(string.format("return function (%s) return %s end", params, rt))()
 end
@@ -194,7 +195,7 @@ end
 local function reduce (fn, t, init)
   local gen = type(t) == 'table' and values(t) or t
   init = init or gen()
-  
+
   for v in gen do
     init = fn(init, v)
   end
@@ -204,7 +205,7 @@ end
 
 --- puts together each element of `t1` with a corresponding element of each table in `...`
 -- for each key of `t1`, puts the value of `t1[key]` and `tx[key]`, where
--- tx is a table from `...`  together in an array. If `t1` and `tx` are uneven 
+-- tx is a table from `...`  together in an array. If `t1` and `tx` are uneven
 -- or keys in `t1` are not found in `tx`, the value of `t1` for such cases will be
 -- an array with less than `#{...} + 1` elements.
 --
@@ -216,7 +217,7 @@ end
 --         key of `t`.
 local function zip (...)
   local tmp = totable(map(values, {...}))
-  
+
   return function ()
     return table.unpack(totable(map(call, tmp)))
   end
@@ -225,7 +226,7 @@ end
 --- creates a new function with new defaults
 --
 -- @tparam function fn
--- @tparam ...
+-- @param ...
 -- @return
 -- @usage
 --  local fn = partial(function (a, b) return a*b end, 2)
@@ -236,7 +237,7 @@ local function partial (fn, ...)
 
   return function (...)
     local args = { }
-    
+
     for _, v in pairs(pargs) do
       table.insert(args, v)
     end
@@ -253,7 +254,7 @@ end
 --
 -- @tparam int index
 -- @param ...
--- @return 
+-- @return
 -- @usage assert(pick(2, 5, 6, 7) == 6)
 local function pick (index, ...)
   local args = {...}
@@ -271,9 +272,9 @@ local function memoize (fn, cache)
   return function (...)
     local args = {...}
     local hashkey = string.dump(function () return args end)
-    
+
     if cache[hashkey] == nil then
-      cache[hashkey] = fn(...) 
+      cache[hashkey] = fn(...)
     end
 
     return cache[hashkey]
