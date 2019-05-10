@@ -31,14 +31,14 @@ describe('filter output is as expected', function ()
   it('keeps items in condition', function ()
     local rs = filter(function (v) return true end, t)
     local rsa = totable(rs)
-    
+
     assert.are.same(rsa, t)
   end)
 
   it('removes items not in condition', function ()
     local rs = filter(function (v) return v % 2 == 0 end, t)
     local rsa = totable(rs)
-    
+
     assert.are.same(rsa, {2, 4, 6})
   end)
 
@@ -59,11 +59,11 @@ describe('keys output is as expected', function ()
     local tmp = {}
     local t = {2, 3, 4}
     local t_k = {1, 2, 3}
-    
+
     for k in keys(t) do
       table.insert(tmp, k)
     end
-    
+
     table.sort(tmp)
     assert.are.same(tmp, t_k)
   end)
@@ -72,11 +72,11 @@ describe('keys output is as expected', function ()
     local tmp = {}
     local t = {a=2, b=3, c=4}
     local t_k = {'a', 'b', 'c'}
-    
+
     for k in keys(t) do
       table.insert(tmp, k)
     end
-    
+
     table.sort(tmp)
     assert.are.same(tmp, t_k)
   end)
@@ -89,11 +89,11 @@ describe('values output is as expected', function ()
     local tmp = {}
     local t = {2, 3, 4}
     local t_k = {2, 3, 4}
-    
+
     for v in values(t) do
       table.insert(tmp, v)
     end
-    
+
     table.sort(tmp)
     assert.are.same(tmp, t_k)
   end)
@@ -102,11 +102,11 @@ describe('values output is as expected', function ()
     local tmp = {}
     local t = {a=2, b=3, c=4}
     local t_k = {2, 3, 4}
-    
+
     for v in values(t) do
       table.insert(tmp, v)
     end
-    
+
     table.sort(tmp)
     assert.are.same(tmp, t_k)
   end)
@@ -114,16 +114,16 @@ end)
 
 describe('generator output is as expected', function ()
   local generator = require('lua_fun').generator
-  
+
   it('creates an generator for array with keys', function ()
     local tmp = {}
     local t = {2, 3, 4}
     local t_k = {1, 2, 3}
-    
+
     for k, v in generator(t) do
       table.insert(tmp, k)
     end
-    
+
     table.sort(tmp)
     assert.are.same(tmp, t_k)
   end)
@@ -132,11 +132,11 @@ describe('generator output is as expected', function ()
     local tmp = {}
     local t = {a=2, b=3, c=4}
     local t_k = {'a', 'b', 'c'}
-    
+
     for k, v in generator(t) do
       table.insert(tmp, k)
     end
-    
+
     table.sort(tmp)
     assert.are.same(tmp, t_k)
   end)
@@ -145,11 +145,11 @@ describe('generator output is as expected', function ()
     local tmp = {}
     local t = {2, 3, 4}
     local t_k = {2, 3, 4}
-    
+
     for k, v in generator(t) do
       table.insert(tmp, v)
     end
-    
+
     table.sort(tmp)
     assert.are.same(tmp, t_k)
   end)
@@ -341,14 +341,14 @@ describe('flip output is as expected', function ()
 
   it('returns a new function', function ()
     local hello = function () return "hi" end
-    
+
     assert.are.equal(type(flip(hello)), 'function')
     assert.are_not.equal(flip(hello), hello)
   end)
 
   it('works with functions without arguments', function ()
     local hello = function () return "Hello!" end
-    
+
     assert.are.equal(hello(), flip(hello)())
   end)
 
@@ -380,7 +380,7 @@ describe('factory output is as expected', function ()
   end)
 
   it('each call receives the last value of the call', function ()
-    local fn = factory(function(i, v) 
+    local fn = factory(function(_, v)
       if v == nil then return 1 end
       return v + 2
     end)
@@ -392,21 +392,33 @@ describe('factory output is as expected', function ()
 
   it('stop condition is inclusive', function ()
     local fn = factory(
-      function (i, v) return i end,
-      function (i, v) return i == 5 end
+      function (i) return i end,
+      function (i) return i <= 5 end
     )
-    
-    assert.are.same({1,2,3,4}, totable(fn))
+
+    assert.are.same({1, 2, 3, 4, 5}, totable(fn))
   end)
 
   it('initial value sets first iteration value', function ()
     local fn = factory(
-      function (i, v) return v + 1 end,
-      function (i, v) return v == 5 end,
+      function (_, v) return v + 1 end,
+      function (_, v) return v <= 5 end,
       2
     )
-    
-    assert.are.same({3,4,5}, totable(fn))
+
+    assert.are.same({3, 4, 5}, totable(fn))
+  end)
+
+  it('has 1 as first index of the iteration', function ()
+    local fn = factory(function () end)
+
+    assert.are.same(fn(), 1)
+  end)
+
+  it('has nil as first value of the iteration if init is not provided', function ()
+    local fn = factory(function (_, v) return v end)
+
+    assert.is_nil(pick(2, fn()))
   end)
 end)
 

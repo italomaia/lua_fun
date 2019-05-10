@@ -11,12 +11,18 @@ with Lua and functional programming more productive without adding too much
 to the stack. *lua_fun* attempts to provide just enough with good compatibility
 with Lua standard modules.
 
-## Install
+## How To
 
 ```
-luarocks install lua_fun
-# or
-luarocks install --local lua_fun
+# How To Install
+luarocks install lua_fun  # install globally
+luarocks install --local lua_fun  # or install locally
+
+# How To Generate Docs
+ldoc .
+
+# How To Run Tests
+busted --lua=/usr/bin/lua
 ```
 
 ## Getting Started
@@ -26,37 +32,90 @@ luarocks install --local lua_fun
 *lua_fun* usage is advised in one of the following ways:
 
 ```
+-- per function
+local L = require('lua_fun').lambda
+
 -- as a module
 local fun = require('lua_fun')
-
--- extending the environment
-require('lua_fun').patch(_G, ltable)
 ```
 
 ## Examples
 
 ```
 local fun = require('lua_fun)
+local l = fun.lambda
+local generator = fun.generator
+local totable = fun.totable
+local keys = fun.keys
+local values = fun.values
+local call = fun.call
+local compose = fun.compose
+local flip = fun.flip
+local get = fun.get
+local pick = fun.pick
+local factory = fun.factory
+local map = fun.map
+local filter = fun.filter
+local reduce = fun.reduce
+local zip = fun.zip
+local partial = fun.partial
+local memoize = fun.memoize
 
-local sum = function (a, b) return a + b end
-local sum2 = fun.partial(sum, 2)
-local pow2 = fun.partial(fun.flip(math.pow), 2)
-local pow4 = fun.compose(pow2, pow2)
+local sum = l'|a, b| a+b'
+local sum2 = partial(sum, 2)
+local pow2 = partial(flip(math.pow), 2)
+local pow4 = compose(pow2, pow2)
 
-assert(fun.call(sum, 2, 2) == 4)
-assert(sum2(2) == 4)
-assert(pow2(3) == 9)
-assert(pow4(3) == 81)
+assert.are.equal(sum2(3), 5)
+assert.are.equal(pow2(3), 9)
+assert.are.equal(pow4(2), 16)
+assert.are.equal(call(sum, 3, 3), 6)
+assert.are.equal(get(3, {5, 6, 7}), 7)
+assert.are.equal(pick(2, table.unpack({5, 6, 7})), 6)
 
-local L = fun.lambda  -- little shortcut for us 
-local plus_one = L'|x| x + 1'
-assert(plus_one(5) == 6)
+local function fibonacci (n)
+    if n<3 then return 1 else
+        return fibonacci(n-1) + fibonacci(n-2)
+    end
+end
 
-local plus_one_generator = fun.factory(L'|i,v| i')
-local sub = L'|x,y| x/y'
+fibonacci = memoize(fibonacci)  -- cached now =D
 
-assert(sub(1, 0), math.huge)
-assert(fun.flip(sub)(1, 0), 0)
+local cmp_table = function (a, b)
+    for k, v in pairs(a) do
+    if v ~= b[k] then return false end
+    end
 
-local cached_sum = fun.memoize(function(a, b) return a + b end)
+    for k, v in pairs(b) do
+    if v ~= a[k] then return false end
+    end
+
+    return true
+end
+
+local gen, t
+
+gen = filter(l'|v| v % 2 == 0', {1,2,3,4,5,6,7,8})
+assert.are.equal(type(gen), 'function')
+
+t = totable(gen)
+assert.is_true(cmp_table(t, {2, 4, 6, 8}))
+
+gen = map(l'|v| v * 2', t)
+assert.are.equal(type(gen), 'function')
+
+t = totable(gen)
+assert.is_true(cmp_table(t, {4, 8, 12, 16}))
+
+assert.are.equal(reduce(sum, t), 40)
+
+local tkeys = totable(keys({a=10, b=20, c=30}))
+local tvalues = totable(values({a=10, b=20, c=30}))
+
+-- sort guaranties only for arrays
+table.sort(tkeys)
+table.sort(tvalues)
+
+assert.are.same(tkeys, {'a', 'b', 'c'})
+assert.are.same(tvalues, {10, 20, 30})
 ```

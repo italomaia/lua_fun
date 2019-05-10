@@ -44,14 +44,12 @@ end
 -- @return function () callable that returns each value in `t` once
 -- @usage gen = generator({2, 3, 4}); assert(gen() == 2); assert(gen() == 3); assert(gen() == 4);
 local function keys (t)
-  if type(t) == 'table' then
-    local index, value
+  local gen = generator(t)
 
-    return function ()
-      index, value = next(t, index)
-      return index
-    end
-  else error('unsupported param type') end
+  return function ()
+    local index, _ = gen()
+    return index
+  end
 end
 
 --- creates a generator function for the values of `t`
@@ -61,14 +59,12 @@ end
 -- @return function () callable that returns each value in `t` once
 -- @usage gen = generator({2, 3, 4}); assert(gen() == 2); assert(gen() == 3); assert(gen() == 4);
 local function values (t)
-  if type(t) == 'table' then
-    local index, value
+  local gen = generator(t)
 
-    return function ()
-      index, value = next(t, index)
-      return value
-    end
-  else error('unsupported param type') end
+  return function ()
+    local _, value = gen()
+    return value
+  end
 end
 
 --- calls a function with the provided argument
@@ -118,20 +114,23 @@ local function get (index, t)
   return t[index]
 end
 
---- generates values until condition is met
+--- generates values while condition is met
 --
 -- @tparam function fn(i, v) generates value series; receives init or last call output as input
--- @tparam[opt=function] function fnc(i, v) exclusive condition of stop; if omitted, factory never stops
+-- @tparam[opt=function] function fnc(i, v) inclusive condition of continuity;
+--    if omitted, factory never stops
 -- @tparam[opt] any init
--- @usage factory(L'|i,v| v + 1', L'|i,v| v == 10')
+-- @usage factory(L'|i,v| v + 1', L'|i,v| v < 10')
 local function factory (fn, fnc, init)
   local value, index = init, 0
-  fnc = fnc or function () return false end
+  -- sensible default
+  fnc = fnc or function () return true end
 
   return function ()
     index = index + 1
-    if not fnc(index, value) then
-      value = fn(index, value)
+    value = fn(index, value)
+
+    if fnc(index, value) then
       return index, value
     end
   end
@@ -215,6 +214,7 @@ end
 --         a array where the first element is a value of `t` and
 --         and the others are values of elements of {...} for each
 --         key of `t`.
+-- @usage zip({'a', 'b'}, {'x', 'y'}, {5, 6})  # {{'a', 'x', 5}, {'b', 'y', 6}}
 local function zip (...)
   local tmp = totable(map(values, {...}))
 
