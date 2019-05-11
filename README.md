@@ -27,7 +27,7 @@ busted --lua=/usr/bin/lua
 
 ## Getting Started
 
-[docs](https://github.com/italomaia/lua_fun/blob/master/docs/index.html)
+[Documentation](https://italomaia.github.io/lua_fun/)
 
 *lua_fun* usage is advised in one of the following ways:
 
