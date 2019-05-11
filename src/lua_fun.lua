@@ -208,13 +208,12 @@ end
 -- or keys in `t1` are not found in `tx`, the value of `t1` for such cases will be
 -- an array with less than `#{...} + 1` elements.
 --
--- @param table
--- @param ... variable number of tables
--- @return table where each key is a key of `t` and each value is
---         a array where the first element is a value of `t` and
---         and the others are values of elements of {...} for each
---         key of `t`.
--- @usage zip({'a', 'b'}, {'x', 'y'}, {5, 6})  # {{'a', 'x', 5}, {'b', 'y', 6}}
+-- @param ... variable number of arrays
+-- @return table with values of each table grouped by index
+-- @usage
+--  for x, y, z in zip({'a', 'b'}, {'x', 'y'}, {5, 6}) do
+--    print(x, y, z)  -- a x 5 then b y 6
+--  end
 local function zip (...)
   local tmp = totable(map(values, {...}))
 

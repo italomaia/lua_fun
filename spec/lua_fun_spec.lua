@@ -295,8 +295,8 @@ describe('zip output is as expected', function ()
   it('iterates over multiple tables at once', function ()
     local tmp = {}
 
-    for a, b in zip({'a', 'b', 'c'}, {2, 4, 6}) do
-      table.insert(tmp, {a, b})
+    for x, y in zip({'a', 'b', 'c'}, {2, 4, 6}) do
+      table.insert(tmp, {x, y})
     end
 
     assert.are.same(tmp, {
