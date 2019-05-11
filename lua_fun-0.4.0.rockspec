@@ -10,11 +10,12 @@ description = {
         Lua simplicity is its biggest strengh and weakness. The lack of
         common functional programming utilities can hinder development speed
         quite much in the long run.
+
         This package's goal is to help with that by providing a pure lua, simple,
         yet powerful set of **FP** functions out-of-the-box to make the wonderful
         lua programming experience also super fast and natural.
 
-        This module has **luafun** and **lodash** as strong influences. 
+        This module has **luafun** and **lodash** as strong influences.
     ]],
     license = "MIT/X11"
 }
