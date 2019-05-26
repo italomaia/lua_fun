@@ -1,8 +1,8 @@
 package="lua_fun"
-version="0.4.0-2"
+version="0.4-3"
 source = {
     url = "git+https://github.com/italomaia/lua_fun",
-    tag = "0.4.0-2"
+    tag = "0.4-3"
 }
 description = {
     summary = "set of useful functional programming tools to speed up development with lua",
