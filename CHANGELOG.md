@@ -1,3 +1,7 @@
+# 0.4.0-2
+
+* Fixed rockspec file (now, for real!)
+
 # 0.4-1
 
 * Fixed rockspec file
