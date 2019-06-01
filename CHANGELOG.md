@@ -1,6 +1,11 @@
+# 0.4.1-0
+
+* Another attempt to fix the package, following suggestion here: https://github.com/luarocks/luarocks/issues/1017
+* No API changes
+
 # 0.4-3
 
-Another attempt
+* Another attempt
 
 # 0.4.0-2
 
