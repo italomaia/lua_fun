@@ -1,3 +1,11 @@
+---Functional programming library for lua lang.
+-- @module lua_fun
+-- @author Italo Maia
+-- @license MIT
+-- @copyright IMAIA, 2019
+
+-- @section functions
+
 --- evaluates a one or two values generator into a table
 -- creates an array for a single value generator and a regular table otherwise
 --
